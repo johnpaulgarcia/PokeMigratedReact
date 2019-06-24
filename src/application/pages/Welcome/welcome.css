@@ -1,0 +1,32 @@
+.top-shifter {
+    width: inherit;
+    height: 400px;
+    background: #e84118;
+    clip-path: polygon(0 0, 100% 0, 94% 100%, 8% 100%);
+}
+
+.pokemon-logo {
+    width: 500px;
+}
+
+.poke-wc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.start {
+    width: 200px;
+    outline: none;
+    border: none;
+    background: #0097e6;
+    color: white;
+    font-size: 16px;
+    margin-top: 40px;
+    height: 60px;
+}
+.start:active {
+    transform: scale(0.97);
+}
