@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import Container from '../../components/Container';
+import React, { Component,Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import pokemon from '../../assets/pokemon.png'
 export default class Welcome extends Component {
     constructor(props){
@@ -11,21 +11,22 @@ export default class Welcome extends Component {
 
     render(){
         return(
-            <Container>
+                <Fragment>
                 <div className="top-shifter poke-wc">
                   <img src={pokemon} class="pokemon-logo"/>
                 </div>
 
                 <div class="poke-wc">
                    
-
+                    <Link to="/hometown">
                     <button class="start">
                         Start Poke Hunt
                     </button>
+                    </Link>
                 </div>
-
+                </Fragment>
                 
-            </Container>
+            
 
         );
     }
