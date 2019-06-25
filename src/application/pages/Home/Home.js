@@ -131,9 +131,11 @@ export default class Home extends Component {
     capture = () => {
         let rand = (Math.random() * 100)+Math.random()*20;
         console.log(this.state.found);
+        let id = this.state.bag.length + 1;
         let name = this.state.found.name;
         let avatar = this.state.found.avatar;
         let obj = {
+            id,
             name,
             avatar
         }
@@ -162,6 +164,14 @@ export default class Home extends Component {
             recapture: false
             
         })
+    }
+
+    del = (id) => {
+        if(window.confirm("Are you sure to remove this from pokemon your bag?")){
+            this.setState({
+                bag: this.state.bag.filter(key=>key.id !== id)
+            })
+        }
     }
 
     clicked = (val) => {
@@ -307,7 +317,7 @@ export default class Home extends Component {
                         {bag ? bag.map(key=>{
                            
                             return(
-                                <div>
+                                <div onClick={()=>this.del(key.id)}>
                                 <img class="bag-item" src={`${key.avatar}`} />
                                 <p class="name-x">{key.name}</p>
                                 </div>
