@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component,Fragment } from 'react';
 import bg from '../../assets/moving.gif';
 import { getData } from '../../actions';
 import { getRegions } from '../../api';
@@ -14,7 +14,13 @@ export default class Home extends Component {
             a1: false,
             a2: false,
             a3: false,
-            found: []
+            found: [],
+            activeFind: '',
+            visible: false,
+            bag: [],
+            recapture: true,
+            notify: false,
+            message: ''
         }
     }
 
@@ -40,7 +46,8 @@ export default class Home extends Component {
             this.setState({
                 a1: true,
                 a2: false,
-                a3: false
+                a3: false,
+               
             })
            
         }
@@ -55,12 +62,14 @@ export default class Home extends Component {
             this.setState({
                 a1: false,
                 a2: true,
-                a3: false
+                a3: false,
+                visible: false
             })
         }
     }
 
     findingNemo = (val) => {
+       if(this.state.bag.length <= 7){
         getData(val)
             .then(data=>{
                 let data1 = data.data.pokemon_encounters;
@@ -92,26 +101,83 @@ export default class Home extends Component {
                     });
 
                       this.setState({
-                          found: obj
+                          found: obj,
+                          visible: true,
+                          recapture: true
                       })
-                      console.log(obj.status[0].stat);
+                      
             
                   })
 
-            })
+            });
+        }
+        else {
+            this.setState({
+
+                notify: true,
+                message: "Your bag is full."
+            });
+
+            setTimeout(()=>{
+                this.setState({
+                    notify: false,
+                    message: ''
+                })
+            },1000)
+        }
+    }
+
+
+    capture = () => {
+        let rand = (Math.random() * 100)+Math.random()*20;
+        console.log(this.state.found);
+        let name = this.state.found.name;
+        let avatar = this.state.found.avatar;
+        let obj = {
+            name,
+            avatar
+        }
+
+       
+        if(rand>40){
+            this.setState({bag: [...this.state.bag,obj]});
+        }
+        else {
+            this.setState({
+
+                notify: true,
+                message: `${name.toUpperCase()} has escaped. Such talent.`
+            });
+
+            setTimeout(()=>{
+                this.setState({
+                    notify: false,
+                    message: ''
+                })
+            },3000)
+        }
+
+        this.setState({
+            found: [],
+            recapture: false
+            
+        })
     }
 
     clicked = (val) => {
-        // this.setState({
-        //     activeregion: val.name
-        // })
+       
+        this.setState({
+           notify: false,
+           message: ''
+        })
 
       val = val.target.value;
       
       if(val.match(/area/,'gi')){
-        this.setState({activearea: val})
+        this.setState({activearea: val,activeFind: val})
 
             // run algorithm
+            
             this.findingNemo(val);
 
       }
@@ -145,10 +211,30 @@ export default class Home extends Component {
     }
     }
 
+   
+
     render(){
-        let { data,a1,a2,a3,activeregion,activelocation,activearea,found } = this.state;
+        let { 
+            data,
+            a1,
+            a2,
+            a3,
+            found,
+            visible,
+            bag,
+            recapture,
+            notify,
+            message
+         } = this.state;
+        console.log(bag);
         return(
             <div  style={{backgroundImage: `url(${bg})`,backgroundSize: 'cover'}} class="hometown">
+                {notify &&
+                    <div class="notify">
+                        {message}
+                    </div>
+
+                }
                 <div class="left">
                    {!a1 && (a2 || a3) &&  <button onClick={()=>this.back()} class="back">
                         Back
@@ -174,13 +260,13 @@ export default class Home extends Component {
                        Welcome.
                     </h1>
 
-                    <div class="content-2">
-                        <div class="logo-a">
+                   {visible && <div class="content-2">
+                        {recapture && <div class="logo-a">
                             <div class="pokemon">
                                 <img class="avatar" src={`${found.avatar}`} />
                             </div>
                             <h3 class="pkk-tag">You found {found.name}</h3>
-                        </div>
+                        </div>}
 
                         <div class="attributes">
                             <div class="props">
@@ -194,15 +280,40 @@ export default class Home extends Component {
                                         return(
                                             <p class="tags-x">{key.name} : {key.stat}</p>
                                         )
-                                    }): 'No data'
+                                    }): 'No Pokemon to scan'
                                 }
                               </fieldset>
+                            </div>
+
+                            <div class="btns">
+                              {recapture &&  <button onClick={()=>this.capture()} class="btn-capture">
+                                    Capture
+                                </button>}
+
+                                <button onClick={()=>this.findingNemo(this.state.activeFind)} class="btn-capture explore">
+                                Explore
+                            </button>
                             </div>
                         </div>
                     </div>
 
+                   
+                
+                }
+
                     <div class="bag">
                      <p class="pk-tag">Your Poke Bag</p>
+                     <div class="bag-actual">
+                        {bag ? bag.map(key=>{
+                           
+                            return(
+                                <div>
+                                <img class="bag-item" src={`${key.avatar}`} />
+                                <p class="name-x">{key.name}</p>
+                                </div>
+                            );
+                        }):'No data'}
+                     </div>
                     </div>
                 </div>
             </div>
